@@ -1,25 +1,17 @@
-
+import java.io.*;
 import java.sql.*;
-
+import java.util.ArrayList;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
+        BaseDao baseDao = new BaseDao();
+        ArrayList<ArrayList<String>> result = baseDao.exceuteQuery("SELECT * FROM websites;", null);
 
-        try{
-            Connection connection = DriverManager.getConnection(DB.URL, DB.USERNAME, DB.PASSWORD);
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM websites;");
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                String url = resultSet.getString("url");
-                System.out.println(id+"\t"+name+"\t"+url);
+        for (ArrayList<String> line : result) {
+            for (String s : line) {
+                System.out.print(s + "\t");
             }
-            resultSet.close();
-            statement.close();
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("\n");
         }
 
     }

@@ -2,7 +2,6 @@ import java.io.FileInputStream;
 import java.sql.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 import java.util.ArrayList;
 
@@ -24,7 +23,7 @@ public class BaseDao {
     }
 
 
-    public static void init() {
+    private static void init() {
         try {
             InputStream inputStream = new FileInputStream(configFile);
             Properties properties = new Properties();
@@ -33,10 +32,10 @@ public class BaseDao {
             URL = properties.getProperty("DB_URL");
             USERNAME = properties.getProperty("DB_USERNAME");
             PASSWORD = properties.getProperty("DB_PASSWORD");
-        } catch (IOException e) {
+            Class.forName(JDBC_DRIVER);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        System.setProperty("jdbc.drivers", JDBC_DRIVER);
     }
 
     private void getConnection() {
@@ -92,8 +91,8 @@ public class BaseDao {
         return num;
     }
 
-    public ArrayList<ArrayList<String>> exceuteQuery (String preparedSql, Object[] param){
-        ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
+    public ArrayList<ArrayList<String>> exceuteQuery(String preparedSql, Object[] param){
+        ArrayList<ArrayList<String>> table = new ArrayList<>();
         getConnection();
         try {
             preparedStatement = connection.prepareStatement(preparedSql);
@@ -107,22 +106,16 @@ public class BaseDao {
 
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 
-            int culumnCount = resultSetMetaData.getColumnCount();
-
-            ArrayList<String> line = new ArrayList<String>(culumnCount);
-
-            for (int i = 0; i < culumnCount; i++){
-                line.add(resultSetMetaData.getColumnName(i + 1));
-            }
-            table.add(line);
+            int columnCount = resultSetMetaData.getColumnCount();
 
             while(resultSet.next()){
-                line = new ArrayList<String>(culumnCount);
-                for (int i = 0; i < culumnCount; i++){
+                ArrayList<String> line = new ArrayList<>(columnCount);
+                for (int i = 0; i < columnCount; i++){
                     line.add(resultSet.getString(i + 1));
                 }
                 table.add(line);
             }
+            closeAll();
             return table;
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,8 +123,4 @@ public class BaseDao {
         return null;
     }
 
-
-    public static void main(String[] args) {
-        System.out.println(System.getProperty("jdbc.drivers"));
-    }
 }

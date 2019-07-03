@@ -1,9 +1,8 @@
 import java.io.*;
-import java.sql.*;
 import java.util.ArrayList;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         BaseDao baseDao = new BaseDao();
         ArrayList<ArrayList<String>> result = baseDao.exceuteQuery("SELECT * FROM websites;", null);
 
@@ -11,9 +10,8 @@ public class Main {
             for (String s : line) {
                 System.out.print(s + "\t");
             }
-            System.out.println("\n");
+            System.out.println();
         }
-
     }
 }
 

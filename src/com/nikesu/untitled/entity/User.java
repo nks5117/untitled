@@ -1,5 +1,7 @@
 package com.nikesu.untitled.entity;
 
+import java.io.InputStreamReader;
+
 public class User {
     private String userId;
     private String userName;

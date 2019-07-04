@@ -34,16 +34,16 @@ public interface ReplyDao {
     ArrayList<Reply> getRepliesByPost(String postId);
 
     /**
-     * 对指定帖子的所有回复按 replyId 排序，返回一个包含从第 beg 个回复到第
-     * end - 1 个回复的 ArrayList（从 0 开始计数）。
+     * 对指定帖子的所有回复按 replyId 排序，返回一个从第 beg 个回复（从 0 开始计数）开始，
+     * 共有 cnt 个回复的 ArrayList。
      * 如果参数 beg 大于等于该帖子回复总数，将返回一个长度为 0 的空 ArrayList；
-     * 如果参数 end 大于该帖子回复总数，将返回从第 beg 个回复到最后一个回复的 ArrayList。
+     * 如果参数 beg + cnt 大于等于该帖子回复总数，将返回从第 beg 个回复到最后一个回复的 ArrayList。
      * @param postId
      * @param beg
-     * @param end
+     * @param cnt
      * @return
      */
-    ArrayList<Reply> getRepliesByPost(String postId, int beg, int end);
+    ArrayList<Reply> getRepliesByPost(String postId, int beg, int cnt);
 
     /**
      * 获取指定用户发表的所有回复。
@@ -54,16 +54,16 @@ public interface ReplyDao {
     ArrayList<Reply> getRepliesByUser(String userId);
 
     /**
-     * 对指定用户发表的所有回复按 replyId 排序，返回一个包含从第 beg 个回复到第
-     * end - 1 个回复的 ArrayList（从 0 开始计数）。
+     * 对指定用户发表的所有回复按 replyId 排序，返回一个包含从第 beg 个回复（从 0 开始计数）开始，
+     * 共有 cnt 个回复的 ArrayList。
      * 如果参数 beg 大于等于该用户发表的回复总数，将返回一个长度为 0 的空 ArrayList；
-     * 如果参数 end 大于该用户发表的回复总数，将返回从第 beg 个回复到最后一个回复的 ArrayList。
+     * 如果参数 beg + cnt 大于等于该用户发表的回复总数，将返回从第 beg 个回复到最后一个回复的 ArrayList。
      * @param userId
      * @param beg
-     * @param end
+     * @param cnt
      * @return
      */
-    ArrayList<Reply> getRepliesByUser(String userId, int beg, int end);
+    ArrayList<Reply> getRepliesByUser(String userId, int beg, int cnt);
 
     /**
      * 更新 replyId 对应的回复的 content

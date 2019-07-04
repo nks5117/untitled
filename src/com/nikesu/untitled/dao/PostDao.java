@@ -34,16 +34,16 @@ public interface PostDao {
     ArrayList<Post> getPosts();
 
     /**
-     * 对所有帖子先按 top 排序，再按 postId 排序（即置顶帖在最前），返回一个包含
-     * 从第 beg 个帖子到第 end - 1 个帖子的 ArrayList（从 0 开始计数）。
+     * 对所有帖子先按 top 排序，再按 postId 排序（即置顶帖在最前），返回一个
+     * 从第 beg 个帖子（从 0 开始计数）开始，共有 cnt 个帖子的 ArrayList。
      * 如 getPosts(0,2) 将返回一个由 posts[0] 和 posts[1] 构成的 ArrayList。
      * 如果参数 beg 大于等于帖子总数，将返回一个长度为 0 的空 ArrayList；
-     * 如果参数 end 大于帖子总数，将返回从第 beg 个帖子到最后一个帖子的 ArrayList。
+     * 如果参数 beg + cnt 大于等于帖子总数，将返回从第 beg 个帖子到最后一个帖子的 ArrayList。
      * @param beg
-     * @param end
+     * @param cnt
      * @return
      */
-    ArrayList<Post> getPosts(int beg, int end);
+    ArrayList<Post> getPosts(int beg, int cnt);
 
     /**
      * 获取指定版块的所有帖子。
@@ -54,16 +54,16 @@ public interface PostDao {
     ArrayList<Post> getPostsByForum(String forumId);
 
     /**
-     * 对指定版块的所有帖子先按 top 排序，再按 postId 排序（即置顶帖在最前），
-     * 返回一个包含从第 beg 个帖子到第 end - 1 个帖子的 ArrayList（从 0 开始计数）。
+     * 对指定版块的所有帖子先按 top 排序，再按 postId 排序（即置顶帖在最前），返回一个
+     * 从第 beg 个帖子（从 0 开始计数）开始，共有 cnt 个帖子的 ArrayList。
      * 如果参数 beg 大于等于该板块帖子总数，将返回一个长度为 0 的空 ArrayList；
-     * 如果参数 end 大于该板块帖子总数，将返回从第 beg 个帖子到最后一个帖子的 ArrayList。
+     * 如果参数 beg + cnt 大于等于该板块帖子总数，将返回从第 beg 个帖子到最后一个帖子的 ArrayList。
      * @param forumId
      * @param beg
-     * @param end
+     * @param cnt
      * @return
      */
-    ArrayList<Post> getPostsByForum(String forumId, int beg, int end);
+    ArrayList<Post> getPostsByForum(String forumId, int beg, int cnt);
 
     /**
      * 获取指定用户的所有帖子。
@@ -74,16 +74,16 @@ public interface PostDao {
     ArrayList<Post> getPostsByUser(String userId);
 
     /**
-     * 对指定用户的所有帖子先按 top 排序，再按 postId 排序（即置顶帖在最前），
-     * 返回一个包含从第 beg 个帖子到第 end - 1 个帖子的 ArrayList（从 0 开始计数）。
+     * 对指定用户的所有帖子先按 top 排序，再按 postId 排序（即置顶帖在最前），返回一个
+     * 从第 beg 个帖子（从 0 开始计数）开始，共有 cnt 个帖子的 ArrayList。
      * 如果参数 beg 大于等于该用户发表的帖子总数，将返回一个长度为 0 的空 ArrayList；
-     * 如果参数 end 大于该用户发表的帖子总数，将返回从第 beg 个帖子到最后一个帖子的 ArrayList。
+     * 如果参数 beg + cnt 大于等于该板块帖子总数，将返回从第 beg 个帖子到最后一个帖子的 ArrayList。
      * @param userId
      * @param beg
-     * @param end
+     * @param cnt
      * @return
      */
-    ArrayList<Post> getPostsByUser(String userId, int beg, int end);
+    ArrayList<Post> getPostsByUser(String userId, int beg, int cnt);
 
     /**
      * 更新 postId 对应的帖子的 title

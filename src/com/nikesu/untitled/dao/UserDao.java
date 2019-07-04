@@ -43,16 +43,16 @@ public interface UserDao {
     ArrayList<User> getUsers();
 
     /**
-     * 对所有用户按 userId 排序，返回一个包含从第 beg 个用户到第 end - 1 个用户的
-     * ArrayList（从 0 开始计数）。如 getUsers(0,2) 将返回一个由 user[0] 和
-     * user[1] 构成的 ArrayList。
+     * 对所有用户按 userId 排序，返回一个从第 beg 个用户（从 0 开始计数）
+     * 开始，共有 cnt 个用户的 ArrayList。如 getUsers(0,2) 将返回一个
+     * 由 user[0] 和 user[1] 构成的 ArrayList。
      * 如果参数 beg 大于等于用户总数，将返回一个长度为 0 的空 ArrayList；
-     * 如果参数 end 大于用户总数，将返回从第 beg 个用户到最后一个用户的 ArrayList。
+     * 如果参数 beg + cnt 大于等于用户总数，将返回从第 beg 个用户到最后一个用户的 ArrayList。
      * @param beg
-     * @param end
+     * @param cnt
      * @return
      */
-    ArrayList<User> getUsers(int beg, int end);
+    ArrayList<User> getUsers(int beg, int cnt);
 
     /**
      * 获取指定用户组的所有用户。
@@ -64,17 +64,17 @@ public interface UserDao {
     ArrayList<User> getUsersByGroup(String userGroupId);
 
     /**
-     * 对所有用户组为 userGroupId 的用户按 userId 排序，返回一个包含从第 beg
-     * 个用户到第 end - 1 个用户的 ArrayList（从 0 开始计数）。
+     * 对所有用户组为 userGroupId 的用户按 userId 排序，返回一个从第 beg 个用户
+     * （从 0 开始计数）开始，共有 cnt 个用户的 ArrayList。
      * 如果参数 beg 大于等于该用户组的用户总数，将返回一个长度为 0 的空 ArrayList；
-     * 如果参数 end 大于该用户组的用户总数，将返回从第 beg 个用户到最后一个用户
-     * 的 ArrayList。
+     * 如果参数 beg + cnt 大于等于该用户组的用户总数，将返回从第 beg 个用户到最后
+     * 一个用户的 ArrayList。
      * @param userGroupId
      * @param beg
-     * @param end
+     * @param cnt
      * @return
      */
-    ArrayList<User> getUsersByGroup(String userGroupId, int beg, int end);
+    ArrayList<User> getUsersByGroup(String userGroupId, int beg, int cnt);
 
     /**
      * 更新 userId 对应的用户的 userName

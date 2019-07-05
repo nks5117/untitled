@@ -5,6 +5,11 @@ import com.nikesu.untitled.entity.User;
 
 import java.util.ArrayList;
 
+/**
+ * UserDaoImpl
+ * @author 倪可塑
+ * @version 1.0
+ */
 public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     static final String table = "bbs_user";
     @Override

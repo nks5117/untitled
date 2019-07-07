@@ -43,21 +43,21 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
     @Override
     public ArrayList<User> getUsers() {
-        String sql =  "SELECT * FROM " + table + ";";
+        String sql =  "SELECT * FROM " + table + " ORDER BY userid;";
         ArrayList<User> r = executeQuery(sql, User.class);
         return r;
     }
 
     @Override
     public ArrayList<User> getUsers(int beg, int cnt) {
-        String sql =  "SELECT * FROM " + table + " LIMIT " + beg + "," + cnt + ";";
+        String sql =  "SELECT * FROM " + table + " ORDER BY userid LIMIT " + beg + "," + cnt + ";";
         ArrayList<User> r = executeQuery(sql, User.class);
         return r;
     }
 
     @Override
     public ArrayList<User> getUsersByGroup(String userGroupId) {
-        String sql =  "SELECT * FROM " + table + " WHERE usergroupid = '" + userGroupId + "';";
+        String sql =  "SELECT * FROM " + table + " WHERE usergroupid = '" + userGroupId + "' ORDER BY userid;";
         ArrayList<User> r = executeQuery(sql, User.class);
         return r;
     }
@@ -65,8 +65,8 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     @Override
     public ArrayList<User> getUsersByGroup(String userGroupId, int beg, int cnt) {
         String sql =  "SELECT * FROM " + table +
-                " WHERE usergroupid = '" +
-                userGroupId + "' LIMIT " + beg + "," + cnt + ";";
+                " WHERE usergroupid = '" +  userGroupId +
+                "' ORDER BY userid LIMIT " + beg + "," + cnt + ";";
         ArrayList<User> r = executeQuery(sql, User.class);
         return r;
     }

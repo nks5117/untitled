@@ -12,6 +12,14 @@ import java.util.ArrayList;
  */
 public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     static final String table = "bbs_user";
+    static UserDaoImpl instance = new UserDaoImpl();
+
+    private UserDaoImpl() {};
+
+    public static UserDaoImpl getInstance() {
+        return instance;
+    }
+
     @Override
     public boolean addUser(User user) {
         return insertToTable(table, user) == 1;

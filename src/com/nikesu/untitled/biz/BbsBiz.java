@@ -1,6 +1,10 @@
 package com.nikesu.untitled.biz;
 
+import com.mysql.cj.util.StringUtils;
+import com.nikesu.untitled.dao.UserDao;
+import com.nikesu.untitled.dao.impl.*;
 import com.nikesu.untitled.entity.*;
+import com.nikesu.untitled.util.Sha1Encoder;
 
 import java.util.ArrayList;
 
@@ -33,6 +37,11 @@ public class BbsBiz {
      * @return 合法返回 true，否则返回 false
      */
     public static boolean isValidUserName(String userName) {
+        assert !StringUtils.isNullOrEmpty(userName);
+        if (UserDaoImpl.getInstance().hasName(userName)) {
+            return false;
+        }
+        // TODO
         return true;
     }
 
@@ -46,17 +55,20 @@ public class BbsBiz {
      * @return 合法返回 true，否则返回 false
      */
     public static boolean isValidPassword(String password) {
+        assert !StringUtils.isNullOrEmpty(password);
+        // TODO
         return true;
     }
 
     /**
      * 检查 userGroupId 是否合法，一个合法的 userGroupId 必须已经
      * 存在于数据库内
-     * @param userGroupId
+     * @param userGroupId 用户组 ID，不能为 null
      * @return 合法返回 true，否则返回 false
      */
     public static boolean isValidUserGroupId(String userGroupId) {
-        return true;
+        assert !StringUtils.isNullOrEmpty(userGroupId);
+        return UserGroupDaoImpl.getInstance().hasId("userGroupId");
     }
 
     /**
@@ -79,7 +91,15 @@ public class BbsBiz {
      * @return 成功返回 true，否则返回 false
      */
     public static boolean signUp(String userName, String password, String email, String userGroupId) {
-        return false;
+        assert isValidUserName(userName);
+        assert isValidPassword(password);
+        assert isValidUserGroupId(userGroupId);
+        User user = new User();
+        user.setUserName(userName);
+        user.setPassword(Sha1Encoder.getSha1(Sha1Encoder.getSha1(password) + userName));
+        user.setEmail(email);
+        user.setUserGroupId(userGroupId);
+        return UserDaoImpl.getInstance().addUser(user);
     }
 
     /**
@@ -93,6 +113,22 @@ public class BbsBiz {
      * @return 成功返回一个 BbsBiz 对象，否则返回 null
      */
     public static BbsBiz signIn(String userName, String password) {
+        assert !StringUtils.isNullOrEmpty(userName);
+        assert !StringUtils.isNullOrEmpty(password);
+
+        User user = UserDaoImpl.getInstance().getUserByName(userName);
+
+        if (user == null) {
+            return null;
+        }
+
+        if (Sha1Encoder.getSha1(Sha1Encoder.getSha1(password) + userName).equals(user.getPassword())) {
+            BbsBiz bbsBiz = new BbsBiz();
+            bbsBiz.user = user;
+            bbsBiz.userGroup = UserGroupDaoImpl.getInstance().getUserGroupById(user.getUserGroupId());
+            return bbsBiz;
+        }
+
         return null;
     }
 
@@ -104,7 +140,12 @@ public class BbsBiz {
      * @return 成功返回 true，否则返回 false
      */
     public boolean changePassword(String newPassword) {
-        return false;
+        assert !StringUtils.isNullOrEmpty(newPassword);
+        assert this.user != null;
+        assert !StringUtils.isNullOrEmpty(this.user.getUserId());
+
+        return UserDaoImpl.getInstance().updatePassword(this.user.getUserId(),
+                Sha1Encoder.getSha1(Sha1Encoder.getSha1(newPassword) + this.user.getUserName()));
     }
 
     /**
@@ -113,16 +154,28 @@ public class BbsBiz {
      * @return 成功返回 true，否则返回 false
      */
     public boolean changeEmail(String newEmail) {
-        return false;
+        assert !StringUtils.isNullOrEmpty(newEmail);
+        assert this.user != null;
+        assert !StringUtils.isNullOrEmpty(this.user.getUserId());
+
+        return UserDaoImpl.getInstance().updateEmail(this.user.getUserId(), newEmail);
     }
 
     /**
-     * 禁言 userName 指定的用户（将其移到“已禁言”用户组），
+     * 禁言 userName 指定的用户（将其移到“已禁言”用户组，即 ID 为 3 的用户组）
+     *
      * @param userName
      * @return 成功返回 true，不成功（如 user 没有禁言权限时）返回 false
      */
     public boolean banUser(String userName) {
-        return false;
+        if (this.userGroup.getAllowBanUser().equals("0")) {
+            return false;
+        }
+        User user = UserDaoImpl.getInstance().getUserByName(userName);
+        if (user == null) {
+            return false;
+        }
+        return UserDaoImpl.getInstance().updateUserGroupId(user.getUserId(), "3");
     }
 
     /**
@@ -131,7 +184,10 @@ public class BbsBiz {
      * @return 成功返回 true，不成功（如 user 没有权限时）返回 false
      */
     public boolean delPost(Post post) {
-        return false;
+        if (this.userGroup.getAllowDelPost().equals("0")) {
+            return false;
+        }
+        return PostDaoImpl.getInstance().delPostById(post.getPostId());
     }
 
     /**
@@ -140,7 +196,10 @@ public class BbsBiz {
      * @return 成功返回 true，不成功（如 user 没有权限时）返回 false
      */
     public boolean addForum(Forum forum) {
-        return false;
+        if (this.userGroup.getAllowEditForum().equals("0")) {
+            return false;
+        }
+        return ForumDaoImpl.getInstance().addForum(forum);
     }
 
     /**
@@ -149,7 +208,10 @@ public class BbsBiz {
      * @return 成功返回 true，不成功（如 user 没有权限时）返回 false
      */
     public boolean delForum(Forum forum) {
-        return false;
+        if (this.userGroup.getAllowEditForum().equals("0")) {
+            return false;
+        }
+        return ForumDaoImpl.getInstance().delForumById(forum.getForumId());
     }
 
     /**
@@ -157,7 +219,7 @@ public class BbsBiz {
      * @return
      */
     public ArrayList<Forum> forums() {
-        return null;
+        return ForumDaoImpl.getInstance().getForums();
     }
 
     /**
@@ -167,7 +229,8 @@ public class BbsBiz {
      * @return
      */
     public boolean visitForum(Forum forum) {
-        return false;
+        this.forum = forum;
+        return true;
     }
 
     /**
@@ -177,7 +240,8 @@ public class BbsBiz {
      * @return
      */
     public ArrayList<Post> getPosts(int page) {
-        return null;
+        return PostDaoImpl.getInstance().getPostsByForum(this.forum.getForumId(),
+                POST_PER_PAGE * (page - 1), POST_PER_PAGE);
     }
 
     /**
@@ -187,7 +251,8 @@ public class BbsBiz {
      * @return
      */
     public boolean visitPost(Post post) {
-        return false;
+        this.post = post;
+        return true;
     }
 
     /**
@@ -197,7 +262,8 @@ public class BbsBiz {
      * @return
      */
     public ArrayList<Reply> getReplies(int page) {
-        return null;
+        return ReplyDaoImpl.getInstance().getRepliesByPost(this.post.getPostId(),
+                REPLY_PER_PAGE * (page - 1), REPLY_PER_PAGE);
     }
 
     /**
@@ -207,7 +273,7 @@ public class BbsBiz {
      * @return 成功返回 true，否则返回 false
      */
     public boolean addPost(Post post) {
-        return false;
+        return PostDaoImpl.getInstance().addPost(post);
     }
 
     /**
@@ -217,7 +283,7 @@ public class BbsBiz {
      * @return
      */
     public boolean addReply(Reply reply) {
-        return false;
+        return ReplyDaoImpl.getInstance().addReply(reply);
     }
 
     public User getUser() {

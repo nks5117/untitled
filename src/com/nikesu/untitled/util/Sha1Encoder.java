@@ -6,6 +6,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Sha1Encoder {
+    private Sha1Encoder() {}
+
     /**
      * 使用 SHA-1 加密字符串
      * @param str
@@ -26,7 +28,7 @@ public class Sha1Encoder {
         return null;
     }
 
-    public static String toHex(byte[] bytes) {
+    private static String toHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
         for (int i = 0; i < bytes.length; i++) {
             // 11110000

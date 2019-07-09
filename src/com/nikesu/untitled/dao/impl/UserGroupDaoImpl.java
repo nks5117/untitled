@@ -11,6 +11,13 @@ import java.util.ArrayList;
  */
 public class UserGroupDaoImpl extends BaseDaoImpl implements UserGroupDao{
     static final String table = "bbs_usergroup";
+    static UserGroupDaoImpl instance = new UserGroupDaoImpl();
+
+    private UserGroupDaoImpl() {};
+
+    public static UserGroupDaoImpl getInstance() {
+        return instance;
+    }
 
     /**
      * 将用户组添加进表中，如果受影响行数为1则添加成功，否则添加失败

@@ -14,6 +14,15 @@ import com.nikesu.untitled.entity.User;
  */
 public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 	static final String table = "bbs_post";
+	static PostDaoImpl instance = new PostDaoImpl();
+
+	private PostDaoImpl() {};
+
+	public static PostDaoImpl getInstance() {
+		return instance;
+	}
+
+
 	@Override
 	public boolean addPost(Post post) {
 		return insertToTable(table, post) == 1;

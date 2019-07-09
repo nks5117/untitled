@@ -11,6 +11,13 @@ import com.nikesu.untitled.entity.Reply;
  */
 public class ReplyDaoImpl extends BaseDaoImpl implements ReplyDao{
 	static final String table = "bbs_reply";
+	static ReplyDaoImpl instance = new ReplyDaoImpl();
+
+	private ReplyDaoImpl() {};
+
+	public static ReplyDaoImpl getInstance() {
+		return instance;
+	}
 
 	@Override
 	public boolean addReply(Reply reply) {

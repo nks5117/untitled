@@ -4,10 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 
-public class sensitiveWordFilter {
+public class SensitiveWordFilter {
     private static Set<String> sensitiveWords;
     private static final String wordsFileName = "words.txt";
     private static final String articleFileName = "article.txt";
+
+    private SensitiveWordFilter() {}
+
     /**
      * 返回将输入的字符串中的所有敏感词替换为 "*" 后的字符串
      * 敏感词指出现在集合 sensitiveWords 中的字符串
@@ -23,13 +26,14 @@ public class sensitiveWordFilter {
         return s;
     }
 
-    // 这个方法用来测试
-    public static void main(String[] args) {
-        long begin = System.nanoTime();
+    static
+    {
+        init();
+    }
+
+    private static void init() {
         sensitiveWords = new TreeSet<>((s1, s2)
                 ->((s2.length() - s1.length() == 0)? (s1.compareTo(s2)) : (s2.length() - s1.length())));
-        Scanner scanner = new Scanner(System.in);
-
         FileReader fileReader;
         BufferedReader bufferedReader;
 
@@ -46,8 +50,15 @@ public class sensitiveWordFilter {
             e.printStackTrace();
         }
 
+    }
 
+    // 这个方法用来测试
+    public static void main(String[] args) {
+        long begin = System.nanoTime();
+        Scanner scanner = new Scanner(System.in);
 
+        FileReader fileReader;
+        BufferedReader bufferedReader;
         StringBuilder sb = new StringBuilder();
         try {
             fileReader = new FileReader(articleFileName);

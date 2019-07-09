@@ -12,10 +12,17 @@ import java.util.ArrayList;
 */
 public class ForumDaoImpl extends BaseDaoImpl implements ForumDao {
 	static final String table = "bbs_ForumDao";
-	
-	
-	
-	@Override
+    static ForumDaoImpl instance = new ForumDaoImpl();
+
+    private ForumDaoImpl() {};
+
+    public static ForumDaoImpl getInstance() {
+        return instance;
+    }
+
+
+
+    @Override
     public boolean addForum(Forum forum) {
         return insertToTable(table,forum) == 1;
     }

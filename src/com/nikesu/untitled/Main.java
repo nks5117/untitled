@@ -1,14 +1,17 @@
 package com.nikesu.untitled;
 
+import com.mysql.cj.util.StringUtils;
 import com.nikesu.untitled.biz.BbsBiz;
+import com.nikesu.untitled.dao.impl.UserDaoImpl;
 
 import java.util.Scanner;
 
 public class Main {
-    private static BbsBiz userBiz;
+    private static BbsBiz bbsBiz;
+    private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+
         while (true) {
             showMainMenu();
             int a = scanner.nextInt();
@@ -26,19 +29,21 @@ public class Main {
                 default:
             }
 
-            logout:
-            while (true) {
-                showSignedMenu();
-                int b = scanner.nextInt();
-                switch (b) {
-                    case 1:
-                        userPage();
-                        break;
-                    case 2:
-                        break logout;
-                    case 3:
-                        break;
-                    default:
+            if (bbsBiz != null) {
+                logout:
+                while (true) {
+                    showSignedMenu();
+                    int b = scanner.nextInt();
+                    switch (b) {
+                        case 1:
+                            userPage();
+                            break;
+                        case 2:
+                            break logout;
+                        case 3:
+                            break;
+                        default:
+                    }
                 }
             }
         }
@@ -62,11 +67,62 @@ public class Main {
     }
 
     private static void signIn() {
-        ;
+        System.out.println("-----------Welcome----------");
+        System.out.println("请输入用户名：");
+        String userName = scanner.next();
+        System.out.println("请输入密码：");
+        String password = scanner.next();
+        bbsBiz = BbsBiz.signIn(userName, password);
+        while (bbsBiz == null) {
+            System.out.println("用户名或密码错误！请重新输入。");
+            System.out.println("请输入用户名（输入 . 来退出）：");
+            userName = scanner.next();
+            if (userName.equals(".")) {
+                break;
+            }
+            System.out.println("请输入密码：");
+            password = scanner.next();
+            bbsBiz = BbsBiz.signIn(userName, password);
+        }
     }
 
     private static void signUp() {
-        ;
+        System.out.println("-----------Welcome----------");
+        System.out.println("请输入用户名：");
+        String userName = scanner.next();
+        while (StringUtils.isNullOrEmpty(userName) || !BbsBiz.isValidUserName(userName)) {
+            System.out.println("用户名非法！一个合法的用户名必须：");
+            System.out.println("  1. 没有被占用；");
+            System.out.println("  2. 只能包含字母、数字和下划线（_）；");
+            System.out.println("  3. 只能以字母开头；");
+            System.out.println("  4. 长度介于 3-20 之间。");
+            System.out.println("请输入用户名：");
+            userName = scanner.next();
+        }
+        System.out.println("请输入密码：");
+        String password = scanner.next();
+        while (StringUtils.isNullOrEmpty(password) || !BbsBiz.isValidPassword(password)) {
+            System.out.println("密码非法！一个合法的密码必须：");
+            System.out.println("  1. 只能包含字母、数字和特殊字符（ `~!@#$%^&*()_+-={}|[]\\:\";'<>?,./）；");
+            System.out.println("  2. 必须包含大写字母、小写字母、数字、特殊字符中的至少三种；");
+            System.out.println("  3. 长度介于 6-20 之间。");
+            System.out.println("请输入密码：");
+            password = scanner.next();
+        }
+        System.out.println("请输入邮箱：");
+        String email = scanner.next();
+        if (BbsBiz.signUp(userName, password, email, "1")) {
+            System.out.println("注册成功！请返回主界面登录：");
+        }
+        else {
+            System.out.println("注册失败！请联系管理员获得支持。");
+        }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void userPage() {

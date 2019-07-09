@@ -26,6 +26,8 @@ public class Main {
                     System.out.println("Bye.");
                     System.exit(0);
                     break;
+                case 4:
+                    showAbout();
                 default:
             }
 
@@ -50,10 +52,11 @@ public class Main {
     }
 
     private static void showMainMenu() {
-        System.out.println("-----------Welcome----------");
+        System.out.println("---欢迎来到 untitled BBS----");
         System.out.println("1. 登录");
         System.out.println("2. 注册");
         System.out.println("3. 退出");
+        System.out.println("4. 关于");
         System.out.println("----------------------------");
     }
 
@@ -64,6 +67,17 @@ public class Main {
         System.out.println("3. 板块 1");
         System.out.println("4. 板块 2");
         System.out.println("----------------------------");
+    }
+
+    private static void showAbout() {
+        System.out.println("----------------------------");
+        System.out.println("untitled BBS 管理系统");
+        System.out.println("版本: 1.0.0");
+        System.out.println("作者: 倪可塑、王馨怡、朱君鹏、卢琦、白雪婷");
+        System.out.println("2019-7-9");
+        System.out.println("----------------------------");
+        System.out.println("输入任意字符来回到主菜单");
+        scanner.next();
     }
 
     private static void signIn() {

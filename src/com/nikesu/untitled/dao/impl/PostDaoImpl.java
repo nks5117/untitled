@@ -42,14 +42,14 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 
 	@Override
 	public ArrayList<Post> getPosts() {
-		String sql =  "SELECT * FROM " + table + " ORDER BY top,postId;";
+		String sql =  "SELECT * FROM " + table + " ORDER BY top DESC, postId;";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
 
 	@Override
 	public ArrayList<Post> getPosts(int beg, int cnt) {
-		String sql =  "SELECT * FROM " + table + " LIMIT " + beg + "," + cnt + ";";
+		String sql =  "SELECT * FROM " + table + " ORDER BY top DESC, postId LIMIT " + beg + "," + cnt + ";";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
@@ -57,7 +57,7 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 	@Override
 	public ArrayList<Post> getPostsByForum(String forumId) {
 
-		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + forumId + "';";
+		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + forumId + "' ORDER BY top DESC, postId;";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
@@ -66,14 +66,14 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 	public ArrayList<Post> getPostsByForum(String forumId, int beg, int cnt) {
 		String sql =  "SELECT * FROM " + table +
                 " WHERE forumid = '" +
-                forumId + "' LIMIT " + beg + "," + cnt + ";";
+                forumId + "' ORDER BY top DESC, postId LIMIT " + beg + "," + cnt + ";";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
 
 	@Override
 	public ArrayList<Post> getPostsByUser(String userId) {
-		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + userId + "';";
+		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + userId + "' ORDER BY top DESC, postId;";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
@@ -82,7 +82,7 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 	public ArrayList<Post> getPostsByUser(String userId, int beg, int cnt) {
 		String sql =  "SELECT * FROM " + table +
                 " WHERE forumid = '" +
-                userId + "' LIMIT " + beg + "," + cnt + ";";
+                userId + "' ORDER BY top DESC, postId LIMIT " + beg + "," + cnt + ";";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}

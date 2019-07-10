@@ -1,42 +1,43 @@
 package com.nikesu.untitled.util;
 
-import com.mysql.cj.util.StringUtils;
-
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
 
+/**
+ * @author 白雪婷
+ */
 public class Sha1Encoder {
-    private Sha1Encoder() {}
-
-    /**
-     * 使用 SHA-1 加密字符串
-     * @param str
-     * @return
-     */
     public static String getSha1(String str) {
-        if (StringUtils.isNullOrEmpty(str)) {
+        if(str==null||str.length()==0){
             return null;
         }
-
+        char hexDigits[] = {'0','1','2','3','4','5','6','7','8','9',
+                'a','b','c','d','e','f'};
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-            messageDigest.update(str.getBytes());
-            return toHex(messageDigest.digest());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            MessageDigest mdTemp = MessageDigest.getInstance("SHA1");
+            mdTemp.update(str.getBytes("UTF-8"));
+
+            byte[] md = mdTemp.digest();
+            int j = md.length;
+            char buf[] = new char[j*2];
+            int k = 0;
+            for (int i = 0; i < j; i++) {
+                byte byte0 = md[i];
+                buf[k++] = hexDigits[byte0 >>> 4 & 0xf];
+                buf[k++] = hexDigits[byte0 & 0xf];
+            }
+            return new String(buf);
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 
-    private static String toHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (int i = 0; i < bytes.length; i++) {
-            // 11110000
-            sb.append(Character.forDigit((bytes[i] & 240) >> 4, 16));
-            // 00001111
-            sb.append(Character.forDigit(bytes[i] & 15, 16));
-        }
 
-        return sb.toString();
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String s = scanner.next();
+            System.out.println(getSha1(s));
+        }
     }
 }

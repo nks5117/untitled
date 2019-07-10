@@ -11,7 +11,7 @@ import java.util.ArrayList;
 *@author 朱君鹏
 */
 public class ForumDaoImpl extends BaseDaoImpl implements ForumDao {
-	static final String table = "bbs_ForumDao";
+	static final String table = "bbs_forum";
     static ForumDaoImpl instance = new ForumDaoImpl();
 
     private ForumDaoImpl() {};

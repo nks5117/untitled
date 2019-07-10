@@ -6,6 +6,8 @@ import com.nikesu.untitled.dao.impl.*;
 import com.nikesu.untitled.entity.*;
 import com.nikesu.untitled.util.Sha1Encoder;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -17,8 +19,11 @@ public class BbsBiz {
     private Forum forum;
     private Post post;
 
-    private static final int POST_PER_PAGE = 10;
-    private static final int REPLY_PER_PAGE = 10;
+    private static final int POST_PER_PAGE = 5;
+    private static final int REPLY_PER_PAGE = 5;
+    private static final int USER_PER_PAGE = 5;
+
+    private static final boolean DEBUG = true;
 
     /**
      * 不允许通过 new 得到 BbsBiz 对象，因此将构造函数设为私有。
@@ -33,6 +38,7 @@ public class BbsBiz {
      * 3. 只能以字母开头；
      * 4. 长度必须大于等于 3，小于等于 20。
      * 注意调用者需保证 userName 不为 null
+     * @author 白雪婷
      * @param userName
      * @return 合法返回 true，否则返回 false
      */
@@ -41,7 +47,20 @@ public class BbsBiz {
         if (UserDaoImpl.getInstance().hasName(userName)) {
             return false;
         }
-        // TODO
+        if(!isletter(userName.charAt(0))) {//只能以字母开头
+            return false;
+        }
+        if(userName.length()<3 || userName.length()>20) {//长度必须大于等于 3，小于等于 20
+            return false;
+        }
+        for (int i = 0; i < userName.length(); i++) {
+
+            if (!isletter(userName.charAt(i)) //只能包含英文字母
+                    && !Character.isDigit(userName.charAt(i)) //数字
+                    && userName.charAt(i)!='_') {//下划线
+                return false;
+            }
+        }
         return true;
     }
 
@@ -51,13 +70,49 @@ public class BbsBiz {
      * 2. 必须包含大写字母、小写字母、数字、特殊字符中的至少三种；
      * 3. 长度必须大于等于 6，小于等于 20。
      * 注意调用者需保证 password 不为 null
+     * @author 白雪婷
      * @param password
      * @return 合法返回 true，否则返回 false
      */
     public static boolean isValidPassword(String password) {
         assert !StringUtils.isNullOrEmpty(password);
-        // TODO
+        if (DEBUG) {
+            return true;
+        }
+        if(password.length()<6 || password.length()>20) {//长度必须大于等于 6，小于等于 20
+            //	System.out.println("长度必须大于等于 6，小于等于 20");
+            return false;
+        }
+        int c=0;
+        int special=0;//特殊字符
+        int digit=0;//数字
+        int lower=0;//小写字母
+        int upper=0;//大写字母
+        for (int i = 0; i < password.length(); i++) {
+            c=password.charAt(i);
+            if (0x20>c || c>0x7E) {//只能包含字母、数字和特殊字符
+                //	System.out.println("只能包含字母、数字和特殊字符" +c);
+                return false;
+            }
+            if (Character.isLowerCase(c)) {
+                lower=1;
+            }else if(Character. isUpperCase(c)){
+                upper=1;
+            }else if (Character.isDigit(c)) {
+                digit=1;
+            }else {
+                special=1;
+            }
+        }
+        if (lower+upper+digit+special<3) {
+            //	System.out.println("至少包含字母、数字和特殊字符中的三种");
+            return false;
+        }
         return true;
+    }
+
+    private static boolean isletter(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
     /**
@@ -99,6 +154,7 @@ public class BbsBiz {
         user.setPassword(Sha1Encoder.getSha1(Sha1Encoder.getSha1(password) + userName));
         user.setEmail(email);
         user.setUserGroupId(userGroupId);
+        user.setRegDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         return UserDaoImpl.getInstance().addUser(user);
     }
 
@@ -164,18 +220,24 @@ public class BbsBiz {
     /**
      * 禁言 userName 指定的用户（将其移到“已禁言”用户组，即 ID 为 3 的用户组）
      *
-     * @param userName
+     * @param userId
      * @return 成功返回 true，不成功（如 user 没有禁言权限时）返回 false
      */
-    public boolean banUser(String userName) {
+    public boolean banUser(String userId) {
         if (this.userGroup.getAllowBanUser().equals("0")) {
             return false;
         }
-        User user = UserDaoImpl.getInstance().getUserByName(userName);
-        if (user == null) {
+        return UserDaoImpl.getInstance().updateUserGroupId(userId, "3");
+    }
+
+    public boolean moveUserto(String userId, String userGroupId) {
+        if (this.userGroup.getAllowEditUser().equals("0")) {
             return false;
         }
-        return UserDaoImpl.getInstance().updateUserGroupId(user.getUserId(), "3");
+        if (UserGroupDaoImpl.getInstance().getUserGroupById(userGroupId) == null) {
+            return false;
+        }
+        return UserDaoImpl.getInstance().updateUserGroupId(userId, userGroupId);
     }
 
     /**
@@ -202,24 +264,64 @@ public class BbsBiz {
         return ForumDaoImpl.getInstance().addForum(forum);
     }
 
+    public boolean addForum(String forumName) {
+        Forum forum = new Forum();
+        forum.setForumName(forumName);
+        return ForumDaoImpl.getInstance().addForum(forum);
+    }
+
     /**
      * 删除版块 forum
      * @param forum
      * @return 成功返回 true，不成功（如 user 没有权限时）返回 false
      */
     public boolean delForum(Forum forum) {
-        if (this.userGroup.getAllowEditForum().equals("0")) {
+        assert this.userGroup.getAllowEditForum().equals("1");
+        return ForumDaoImpl.getInstance().delForumById(forum.getForumId());
+    }
+
+    public boolean delForum(String forumId) {
+        return ForumDaoImpl.getInstance().delForumById(forumId);
+    }
+
+    /**
+     * 删除用户 user
+     * @param user
+     * @return
+     */
+    public boolean delUser(User user) {
+        if (this.userGroup.getAllowEditUser().equals("0")) {
             return false;
         }
-        return ForumDaoImpl.getInstance().delForumById(forum.getForumId());
+        return UserDaoImpl.getInstance().delUserById(user.getUserId());
+    }
+
+    public boolean delUser(String userId) {
+        return UserDaoImpl.getInstance().delUserById(userId);
     }
 
     /**
      * 返回一个所有板块的列表
      * @return
      */
-    public ArrayList<Forum> forums() {
+    public ArrayList<Forum> getForums() {
         return ForumDaoImpl.getInstance().getForums();
+    }
+
+    /**
+     * 返回一个所有用户的列表
+     * @return
+     */
+    public ArrayList<User> getUsers() {
+        return UserDaoImpl.getInstance().getUsers();
+    }
+
+    public ArrayList<User> getUsers(int page) {
+        return UserDaoImpl.getInstance().getUsers(USER_PER_PAGE * (page - 1), USER_PER_PAGE);
+    }
+
+    public ArrayList<UserGroup> getUserGroups() {
+        return UserGroupDaoImpl.getInstance().getUserGroups();
     }
 
     /**
@@ -284,6 +386,18 @@ public class BbsBiz {
      */
     public boolean addReply(Reply reply) {
         return ReplyDaoImpl.getInstance().addReply(reply);
+    }
+
+    public boolean hasUserId(String userId) {
+        return UserDaoImpl.getInstance().hasId(userId);
+    }
+
+    public boolean hasUserGroupId(String userGroupId) {
+        return UserGroupDaoImpl.getInstance().hasId(userGroupId);
+    }
+
+    public boolean hasForumId(String forumId) {
+        return ForumDaoImpl.getInstance().hasId(forumId);
     }
 
     public User getUser() {

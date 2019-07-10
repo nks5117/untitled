@@ -1,9 +1,15 @@
 package com.nikesu.untitled.util;
 
+import com.mysql.cj.util.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 
+/**
+ * @author 卢琦
+ * @author 王馨怡
+ */
 public class SensitiveWordFilter {
     private static Set<String> sensitiveWords;
     private static final String wordsFileName = "words.txt";
@@ -11,9 +17,11 @@ public class SensitiveWordFilter {
     private static Node root;
     /*敏感词长度对应的*个数*/
     private static String[] stars=new String[50];
+    private static int cnt = 0;
 
     /*覆盖文本中的所有敏感词，若文本中某一子串同时包含有重叠部分的非子串关系的两敏感词，覆盖先查询到的敏感词*/
     public static String replaceSensitiveWords(String text){
+        cnt = 0;
         StringBuilder sb=new StringBuilder();
         boolean flag=false;
         Node curr = root;
@@ -32,6 +40,7 @@ public class SensitiveWordFilter {
                 if(curr.isWord()){
                     int length=curr.str.length();
                     sb.replace(i-length+1, i+1, stars[length]);
+                    cnt++;
                 }
 
                 /*该敏感词的中间某部分字符串可能正好包含另一个敏感词，
@@ -39,6 +48,7 @@ public class SensitiveWordFilter {
                 if(curr.fail!=null &&curr.fail.isWord()){
                     int length=curr.fail.str.length();
                     sb.replace(i-length+1, i+1, stars[length]);
+                    cnt++;
                 }
 
                 /*索引自增，指向文本中下一个字符*/
@@ -65,13 +75,29 @@ public class SensitiveWordFilter {
      * @return
      */
     public static String naiveReplace(String text) {
-        Iterator<String> it=sensitiveWords.iterator();
-
-        while(it.hasNext()) {
-            String s = it.next();
+        for (String s : sensitiveWords) {
             text = text.replace(s,stars[s.length()]);
         }
         return text;
+    }
+
+    public static String veryNaiveReplace(String text) {
+        StringBuilder sb = new StringBuilder(text);
+        for (String s : sensitiveWords) {
+            for (int i = 0; i < sb.length() - s.length() + 1; i++) {
+                boolean flag = true;
+                for (int j = 0; j < s.length(); j++) {
+                    if (sb.charAt(i+j) != s.charAt(j)) {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    sb.replace(i, i+s.length(), stars[s.length()]);
+                }
+            }
+        }
+        return sb.toString();
     }
 
     /*内部静态类，用于表示AC自动机的每个结点*/
@@ -213,21 +239,27 @@ public class SensitiveWordFilter {
         String content = sb.toString();
 
         System.out.println("敏感词数量：" + sensitiveWords.size() + "\t文章长度：" + content.length());
-        //System.out.println("替换前：        " + content);
-        System.out.println("替换后：");
+        //System.out.println("替换前：             " + content);
+        //System.out.println("替换后：");
 
         long nbegin = System.nanoTime();
-        String newContent1 = naiveReplace(content);
+        String newContent1 = veryNaiveReplace(content);
         long nend = System.nanoTime();
 
+        long rbegin = System.nanoTime();
+        String newContent2 = naiveReplace(content);
+        long rend = System.nanoTime();
+
         long acbegin = System.nanoTime();
-        String newContent2 = replaceSensitiveWords(content);
+        String newContent3 = replaceSensitiveWords(content);
         long acend = System.nanoTime();
 
-        //System.out.println(" 朴素算法：     " + newContent1);
-        //System.out.println(" AC 自动机算法：" + newContent2);
-
-        System.out.println("朴素算法耗时：     " + (nend - nbegin)*1.0e-9 + "s");
-        System.out.println("AC 自动机算法耗时：" + (acend - acbegin)*1.0e-9 + "s");
+        //System.out.println(" 朴素算法：          " + newContent1);
+        //System.out.println(" 使用String.replace：" + newContent2);
+        //System.out.println(" AC 自动机算法：     " + newContent3);
+        System.out.println("文章中含有敏感词 " + cnt + "个");
+        System.out.println("朴素算法耗时：      " + (nend - nbegin) * 1.0e-9 + "s");
+        System.out.println("使用String.replace：" + (rend - rbegin) * 1.0e-9 + "s");
+        System.out.println("AC 自动机算法耗时： " + (acend - acbegin) * 1.0e-9 + "s");
     }
 }

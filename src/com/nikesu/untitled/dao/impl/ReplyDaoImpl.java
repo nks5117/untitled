@@ -39,7 +39,7 @@ public class ReplyDaoImpl extends BaseDaoImpl implements ReplyDao{
 	@Override
 	public ArrayList<Reply> getRepliesByPost(String postId) {
 	
-		String sql =  "SELECT * FROM " + table + " WHERE postid = '" + postId + "' OEDER BY replyid;";
+		String sql =  "SELECT * FROM " + table + " WHERE postid = '" + postId + "' ORDER BY replyid;";
         ArrayList<Reply> r = executeQuery(sql, Reply.class);
         return  r;
  	}
@@ -56,7 +56,7 @@ public class ReplyDaoImpl extends BaseDaoImpl implements ReplyDao{
 
 	@Override
 	public ArrayList<Reply> getRepliesByUser(String userId) {
-		String sql =  "SELECT * FROM " + table + " WHERE userid = '" + userId + "' OEDER BY replyid;";
+		String sql =  "SELECT * FROM " + table + " WHERE userid = '" + userId + "' ORDER BY replyid;";
         ArrayList<Reply> r = executeQuery(sql, Reply.class);
         return  r;
 	}

@@ -42,14 +42,14 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 
 	@Override
 	public ArrayList<Post> getPosts() {
-		String sql =  "SELECT * FROM " + table + " ORDER BY top DESC, postId;";
+		String sql =  "SELECT * FROM " + table + " ORDER BY top DESC, postId DESC;";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
 
 	@Override
 	public ArrayList<Post> getPosts(int beg, int cnt) {
-		String sql =  "SELECT * FROM " + table + " ORDER BY top DESC, postId LIMIT " + beg + "," + cnt + ";";
+		String sql =  "SELECT * FROM " + table + " ORDER BY top DESC, postId DESC LIMIT " + beg + "," + cnt + ";";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
@@ -57,7 +57,7 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 	@Override
 	public ArrayList<Post> getPostsByForum(String forumId) {
 
-		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + forumId + "' ORDER BY top DESC, postId;";
+		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + forumId + "' ORDER BY top DESC, postId DESC;";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
@@ -66,14 +66,14 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 	public ArrayList<Post> getPostsByForum(String forumId, int beg, int cnt) {
 		String sql =  "SELECT * FROM " + table +
                 " WHERE forumid = '" +
-                forumId + "' ORDER BY top DESC, postId LIMIT " + beg + "," + cnt + ";";
+                forumId + "' ORDER BY top DESC, postId DESC LIMIT " + beg + "," + cnt + ";";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
 
 	@Override
 	public ArrayList<Post> getPostsByUser(String userId) {
-		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + userId + "' ORDER BY top DESC, postId;";
+		String sql =  "SELECT * FROM " + table + " WHERE forumid = '" + userId + "' ORDER BY top DESC, postId DESC;";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
@@ -82,14 +82,14 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 	public ArrayList<Post> getPostsByUser(String userId, int beg, int cnt) {
 		String sql =  "SELECT * FROM " + table +
                 " WHERE forumid = '" +
-                userId + "' ORDER BY top DESC, postId LIMIT " + beg + "," + cnt + ";";
+                userId + "' ORDER BY top DESC, postId DESC LIMIT " + beg + "," + cnt + ";";
         ArrayList<Post> r = executeQuery(sql, Post.class);
         return r;
 	}
 
 	@Override
 	public boolean updateTitle(String postId, String title) {
-		String sql = "UPDATE " + table + " SET postid = '" + postId + "' WHERE title = '" + title + "';";
+		String sql = "UPDATE " + table + " SET title = '" + title + "' WHERE postid = '" + postId + "';";
 
         // 如果用户的名字原本就是 userName，则 executeUpdate() 会返回 0，这种情况下 updateUserName() 也会返回 false
         return executeUpdate(sql) > 0;
@@ -97,7 +97,7 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 
 	@Override
 	public boolean updateContent(String postId, String content) {
-		String sql = "UPDATE " + table + " SET postId = '" + postId + "' WHERE content = '" + content + "';";
+		String sql = "UPDATE " + table + " SET content = '" + content + "' WHERE postid = '" + postId + "';";
 
         // 如果用户的名字原本就是 userName，则 executeUpdate() 会返回 0，这种情况下 updateUserName() 也会返回 false
         return executeUpdate(sql) > 0;
@@ -105,7 +105,7 @@ public class PostDaoImpl extends BaseDaoImpl implements PostDao{
 
 	@Override
 	public boolean updateTop(String postId, String top) {
-		String sql = "UPDATE " + table + " SET postId = '" + postId + "' WHERE top = '" + top + "';";
+		String sql = "UPDATE " + table + " SET top = '" + top + "' WHERE postid = '" + postId + "';";
 
         // 如果用户的名字原本就是 userName，则 executeUpdate() 会返回 0，这种情况下 updateUserName() 也会返回 false
         return executeUpdate(sql) > 0;

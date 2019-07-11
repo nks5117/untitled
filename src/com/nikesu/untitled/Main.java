@@ -2,12 +2,9 @@ package com.nikesu.untitled;
 
 import com.mysql.cj.util.StringUtils;
 import com.nikesu.untitled.biz.BbsBiz;
-import com.nikesu.untitled.dao.impl.UserDaoImpl;
 import com.nikesu.untitled.dao.impl.UserGroupDaoImpl;
-import com.nikesu.untitled.entity.Forum;
-import com.nikesu.untitled.entity.Post;
-import com.nikesu.untitled.entity.User;
-import com.nikesu.untitled.entity.UserGroup;
+import com.nikesu.untitled.entity.*;
+import com.nikesu.untitled.util.SensitiveWordFilter;
 import com.nikesu.untitled.util.StringFormatter;
 
 import java.time.LocalDateTime;
@@ -23,6 +20,7 @@ public class Main {
     private static final int MENULINEWIDTH = 40;
     private static final int FORUMLINEWIDTH = 100;
     private static final int POSTLINEWIDTH = 100;
+    private static final int REPLYLINEWIDTH = 30;
 
     public static void main(String[] args) {
 
@@ -57,6 +55,7 @@ public class Main {
                             userPage();
                             break;
                         case 0:
+                            bbsBiz = null;
                             break logout;
                         default:
                             visitForum(b - 2);
@@ -144,6 +143,62 @@ public class Main {
         }
     }
 
+    private static void reply(Post post) {
+        while (true) {
+            System.out.println(StringFormatter.alignCenter("回复列表", '-', REPLYLINEWIDTH));
+            ArrayList<Reply> list = bbsBiz.getReplies(post.getPostId());
+            if (list.size() == 0) {
+                System.out.println("没有回复");
+                System.out.println(StringFormatter.splitLine("-", REPLYLINEWIDTH));
+            }
+            for (int i = 0; i < list.size(); i++) {
+                System.out.println(StringFormatter
+                        .alignLeft(bbsBiz.getUserNameById(list.get(i).getUserId()),
+                                '-', REPLYLINEWIDTH / 2)
+                        + StringFormatter.alignRight((i + 1) + " 楼",
+                        '-', REPLYLINEWIDTH / 2));
+                String[] lines = list.get(i).getContent().split("\n");
+                for (String line : lines) {
+                    System.out.println(StringFormatter.wrapText(line, REPLYLINEWIDTH));
+                }
+                System.out.println(StringFormatter.alignRight(list.get(i).getEditTime(), '-', REPLYLINEWIDTH));
+            }
+
+            if (bbsBiz.getUserGroup().getAllowReply().equals("1")) {
+                System.out.print("1. 发表回复\t");
+            }
+            System.out.println("0. 返回");
+            System.out.println(StringFormatter.splitLine("-", REPLYLINEWIDTH));
+            int a = scanner.nextInt();
+            switch (a) {
+                case 1:
+                    if (bbsBiz.getUserGroup().getAllowReply().equals("0")) {
+                        System.out.println("没有回复权限！");
+                    } else {
+                        System.out.println(StringFormatter.alignCenter("发表回复", '-', REPLYLINEWIDTH));
+                        System.out.println("请输入回复内容（输入\"\\n.\\n\"来结束）");
+                        String s;
+                        StringBuilder sb = new StringBuilder();
+                        scanner.nextLine();
+                        while (!(s = scanner.nextLine()).equals(".")) {
+                            sb.append(s).append("\n");
+                        }
+                        Reply reply = new Reply();
+                        reply.setPostId(post.getPostId());
+                        reply.setUserId(bbsBiz.getUser().getUserId());
+                        reply.setContent(SensitiveWordFilter.replaceSensitiveWords(sb.toString()));
+                        reply.setEditTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                        bbsBiz.addReply(reply);
+                        System.out.println("回复成功！");
+                        break;
+                    }
+                case 0:
+                    return;
+                default:
+            }
+        }
+    }
+
     private static void visitPost(int i) {
         if (i < 0 || i >= posts.size()) {
             System.out.println("PAGE NOT FOUND");
@@ -151,18 +206,98 @@ public class Main {
         }
 
         else {
-            String title = posts.get(i).getTitle();
-            System.out.println(StringFormatter.splitLine("-", POSTLINEWIDTH));
-            System.out.println(StringFormatter.wrapText(title, POSTLINEWIDTH));
-            System.out.println("作者：" + UserDaoImpl.getInstance().getUserById(posts.get(i).getUserId()).getUserName());
-            System.out.println("发表时间：" + posts.get(i).getEditTime());
-            System.out.println(StringFormatter.splitLine("-", POSTLINEWIDTH));
-            String[] lines = posts.get(i).getContent().split("\n");
-            for (String line : lines) {
-                System.out.println(StringFormatter.wrapText(line, POSTLINEWIDTH));
+            while (true) {
+                String title = posts.get(i).getTitle();
+                System.out.println(StringFormatter.splitLine("-", POSTLINEWIDTH));
+                System.out.println(StringFormatter.wrapText(title, POSTLINEWIDTH));
+                System.out.println("作者：" + bbsBiz.getUserNameById(posts.get(i).getUserId()));
+                System.out.println("发表时间：" + posts.get(i).getEditTime());
+                System.out.println(StringFormatter.splitLine("-", POSTLINEWIDTH));
+                String[] lines = posts.get(i).getContent().split("\n");
+                for (String line : lines) {
+                    System.out.println(StringFormatter.wrapText(line, POSTLINEWIDTH));
+                }
+                System.out.println(StringFormatter.splitLine("-", POSTLINEWIDTH));
+                System.out.print("1. 回复\t");
+                if (bbsBiz.getUserGroup().getAllowTopPost().equals("1")) {
+                    if (posts.get(i).getTop().equals("0")) {
+                        System.out.print("2. 置顶\t");
+                    }
+                    else {
+                        System.out.print("2. 取消置顶\t");
+                    }
+                }
+                if (bbsBiz.getUserGroup().getAllowEditPost().equals("1")) {
+                    System.out.print("3. 编辑\t");
+                }
+                if (bbsBiz.getUserGroup().getAllowDelPost().equals("1")) {
+                    System.out.print("4. 删除\t");
+                }
+                System.out.println("0. 返回");
+                System.out.println(StringFormatter.splitLine("-", POSTLINEWIDTH));
+                int a = scanner.nextInt();
+                switch (a) {
+                    case 1:
+                        reply(posts.get(i));
+                        break;
+                    case 2:
+                        if (bbsBiz.getUserGroup().getAllowTopPost().equals("0")) {
+                            System.out.println("指令错误！");
+                        } else {
+                            if (posts.get(i).getTop().equals("0")) {
+                                posts.get(i).setTop("1");
+                            }
+                            else {
+                                posts.get(i).setTop("0");
+                            }
+                            bbsBiz.topPost(posts.get(i));
+                            System.out.println("成功！");
+                            try {
+                                Thread.sleep(500);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    case 3:
+                        if (bbsBiz.getUserGroup().getAllowEditPost().equals("0")) {
+                            System.out.println("指令错误！");
+                        } else {
+                            System.out.println("请输入新正文（输入\"\\n.\\n\"来结束）");
+                            String s;
+                            StringBuilder sb = new StringBuilder();
+                            scanner.nextLine();
+                            while (!(s = scanner.nextLine()).equals(".")) {
+                                sb.append(s).append("\n");
+                            }
+                            posts.get(i).setContent(SensitiveWordFilter.replaceSensitiveWords(sb.toString()));
+                            bbsBiz.updatePostContent(posts.get(i));
+                            System.out.println("编辑成功！");
+                            try {
+                                Thread.sleep(500);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    case 4:
+                        if (bbsBiz.getUserGroup().getAllowDelPost().equals("0")) {
+                            System.out.println("指令错误！");
+                        } else {
+                            bbsBiz.delPost(posts.get(i));
+                            System.out.println("删除成功！");
+                            try {
+                                Thread.sleep(500);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        return;
+                    case 0:
+                        return;
+                    default:
+                }
             }
-            System.out.println(StringFormatter.splitLine("-", POSTLINEWIDTH));
-            scanner.next();
         }
     }
 
@@ -186,12 +321,17 @@ public class Main {
             }
             System.out.println(StringFormatter.alignCenter("第 " + page + " 页", '-', FORUMLINEWIDTH));
             System.out.print("0: 返回\t");
+            if (bbsBiz.getUserGroup().getAllowPost().equals("1")) {
+                System.out.print("w. 发帖\t");
+            }
             if (hasNextPage && hasPrevPage) {
                 System.out.println("p: 上一页\tn: 下一页");
             } else if (hasNextPage && !hasPrevPage) {
                 System.out.println("n: 下一页");
-            } else if (!hasNextPage) {
+            } else if (!hasNextPage && hasPrevPage) {
                 System.out.println("p: 上一页");
+            } else {
+                System.out.println("");
             }
             System.out.println(StringFormatter.splitLine("-", FORUMLINEWIDTH));
 
@@ -199,14 +339,50 @@ public class Main {
             if (s.equals("0")) {
                 return;
             } else if (s.equals("n")) {
-                page++;
+                if (hasNextPage) {
+                    page++;
+                }
+                else {
+                    System.out.println("已经是最后一页");
+                }
             } else if (s.equals("p")) {
-                page--;
+                if (hasPrevPage) {
+                    page--;
+                }
+                else {
+                    System.out.println("已经是第一页");
+                }
+            } else if (s.equals("w")) {
+                if (bbsBiz.getUserGroup().getAllowPost().equals("0")) {
+                    System.out.println("您没有发帖权限！");
+                } else {
+                    writePost();
+                    page = 1;
+                }
             } else {
-                //TODO
                 visitPost(Integer.parseInt(s)-1);
             }
         }
+    }
+
+    private static void writePost() {
+        System.out.println(StringFormatter.alignCenter("发表帖子", '-', POSTLINEWIDTH));
+        Post post = new Post();
+        scanner.nextLine();
+        System.out.println("请输入标题：");
+        post.setTitle(SensitiveWordFilter.replaceSensitiveWords(scanner.nextLine()));
+        System.out.println("请输入正文（输入\"\\n.\\n\"来结束）");
+        String s;
+        StringBuilder sb = new StringBuilder();
+        while (!(s = scanner.nextLine()).equals(".")) {
+            sb.append(s).append("\n");
+        }
+        post.setContent(SensitiveWordFilter.replaceSensitiveWords(sb.toString()));
+        post.setForumId(bbsBiz.getForum().getForumId());
+        post.setTop("0");
+        post.setUserId(bbsBiz.getUser().getUserId());
+        post.setEditTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        bbsBiz.addPost(post);
     }
 
     private static void showUsers() {
@@ -232,8 +408,8 @@ public class Main {
                     + StringFormatter.alignLeft(user.getUserName(), ' ', 15) + "|"
                     + StringFormatter.alignLeft(user.getEmail(), ' ', 20) + "|"
                     + StringFormatter.alignLeft(user.getRegDate(), ' ', 10) + "|"
-                    + StringFormatter.alignLeft(UserGroupDaoImpl.getInstance()
-                    .getUserGroupById(user.getUserGroupId()).getUserGroupName(), ' ', 10) + "|");
+                    + StringFormatter.alignLeft(bbsBiz.getUserGroupNameById(user.getUserGroupId()),
+                    ' ', 10) + "|");
         }
         System.out.println("+--------+---------------+--------------------+----------+----------+");
     }
@@ -462,6 +638,7 @@ public class Main {
             password = scanner.next();
             bbsBiz = BbsBiz.signIn(userName, password);
         }
+        System.out.println("登录成功！");
     }
 
     private static void signUp() {

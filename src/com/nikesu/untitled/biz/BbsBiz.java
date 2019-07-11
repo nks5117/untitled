@@ -9,6 +9,8 @@ import com.nikesu.untitled.util.Sha1Encoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author 倪可塑
@@ -24,6 +26,8 @@ public class BbsBiz {
     private static final int USER_PER_PAGE = 5;
 
     private static final boolean DEBUG = true;
+
+    private static Map<String, String> idToNameMap = new HashMap<>();
 
     /**
      * 不允许通过 new 得到 BbsBiz 对象，因此将构造函数设为私有。
@@ -368,6 +372,25 @@ public class BbsBiz {
                 REPLY_PER_PAGE * (page - 1), REPLY_PER_PAGE);
     }
 
+    public ArrayList<Reply> getReplies() {
+        return ReplyDaoImpl.getInstance().getRepliesByPost(this.post.getPostId());
+    }
+
+    public ArrayList<Reply> getReplies(String postId) {
+        return ReplyDaoImpl.getInstance().getRepliesByPost(postId);
+    }
+
+    public String getUserNameById(String userId) {
+        if (!idToNameMap.containsKey(userId)) {
+            idToNameMap.put(userId, UserDaoImpl.getInstance().getUserById(userId).getUserName());
+        }
+        return idToNameMap.get(userId);
+    }
+
+    public String getUserGroupNameById(String userGroupId) {
+        return UserGroupDaoImpl.getInstance().getUserGroupById(userGroupId).getUserGroupName();
+    }
+
     /**
      * 发表帖子
      * 注意：必须已经访问了某个板块（this.forum）才能发表帖子
@@ -376,6 +399,14 @@ public class BbsBiz {
      */
     public boolean addPost(Post post) {
         return PostDaoImpl.getInstance().addPost(post);
+    }
+
+    public boolean topPost(Post post) {
+        return PostDaoImpl.getInstance().updateTop(post.getPostId(), post.getTop());
+    }
+
+    public boolean updatePostContent(Post post) {
+        return PostDaoImpl.getInstance().updateContent(post.getPostId(), post.getContent());
     }
 
     /**

@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS bbs_post;
 DROP TABLE IF EXISTS bbs_forum;
 DROP TABLE IF EXISTS bbs_user;
 DROP TABLE IF EXISTS bbs_usergroup;
-DROP TABLE IF EXISTS bbs_sensitiveword;
+-- DROP TABLE IF EXISTS bbs_sensitiveword;
 
 -- 论坛用户表
 CREATE TABLE bbs_user (
@@ -13,6 +13,7 @@ CREATE TABLE bbs_user (
   `password` CHAR(42) NOT NULL DEFAULT '',          -- 用户密码（需要加密）
   regdate DATE NOT NULL DEFAULT '1970-1-1',
   usergroupid INTEGER UNSIGNED NOT NULL,
+
   PRIMARY KEY (userid),
   UNIQUE KEY username (username)
   -- CONSTRAINT user_usergroup_fk FOREIGN KEY (usergroupid) REFERENCES bbs_usergroup (usergroupid)
@@ -22,6 +23,7 @@ CREATE TABLE bbs_user (
 CREATE TABLE bbs_forum (
   forumid INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   forumname CHAR(30) NOT NULL DEFAULT '',
+
   PRIMARY KEY (forumid),
   UNIQUE KEY (forumname)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -56,7 +58,8 @@ CREATE TABLE bbs_reply (
 
   PRIMARY KEY (replyid),
   KEY postid (postid),
-  KEY userid (userid)
+  KEY userid (userid),
+  KEY edittime (edittime)
   -- CONSTRAINT reply_post_fk FOREIGN KEY (postid) REFERENCES bbs_post (postid),
   -- CONSTRAINT reply_user_fk FOREIGN KEY (userid) REFERENCES bbs_user (userid)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -75,12 +78,13 @@ CREATE TABLE bbs_usergroup (
   allowedituser TINYINT(1) NOT NULL DEFAULT '0',        -- 允许编辑用户
   allowbanuser TINYINT(1) NOT NULL DEFAULT '0',         -- 允许禁言用户
   alloweditforum TINYINT(1) NOT NULL DEFAULT '0',       -- 允许编辑板块
+
   PRIMARY KEY (usergroupid),
   UNIQUE KEY (usergroupname)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE bbs_sensitiveword (
-  wid INTEGER(11) NOT NULL AUTO_INCREMENT,
-  word VARCHAR(256) NOT NULL,
-  PRIMARY KEY (wid)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- CREATE TABLE bbs_sensitiveword (
+--   wid INTEGER(11) NOT NULL AUTO_INCREMENT,
+--   word VARCHAR(256) NOT NULL,
+--   PRIMARY KEY (wid)
+-- )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

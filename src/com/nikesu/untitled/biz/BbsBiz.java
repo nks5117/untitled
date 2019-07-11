@@ -1,7 +1,6 @@
 package com.nikesu.untitled.biz;
 
 import com.mysql.cj.util.StringUtils;
-import com.nikesu.untitled.dao.UserDao;
 import com.nikesu.untitled.dao.impl.*;
 import com.nikesu.untitled.entity.*;
 import com.nikesu.untitled.util.Sha1Encoder;
@@ -25,7 +24,7 @@ public class BbsBiz {
     private static final int REPLY_PER_PAGE = 5;
     private static final int USER_PER_PAGE = 5;
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static Map<String, String> idToNameMap = new HashMap<>();
 

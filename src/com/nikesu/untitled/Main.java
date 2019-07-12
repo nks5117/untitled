@@ -25,22 +25,23 @@ public class Main {
 
         while (true) {
             showMainMenu();
-            int a = scanner.nextInt();
+            String a = scanner.next();
             switch (a) {
-                case 1:
+                case "1":
                     signIn();
                     break;
-                case 2:
+                case "2":
                     signUp();
                     break;
-                case 3:
+                case "3":
                     showAbout();
                     break;
-                case 0:
+                case "0":
                     System.out.println("Bye.");
                     System.exit(0);
                     break;
                 default:
+                    System.out.println("输入错误");
             }
 
             if (bbsBiz != null) {
@@ -48,16 +49,16 @@ public class Main {
                 logout:
                 while (true) {
                     showSignedMenu();
-                    int b = scanner.nextInt();
+                    String b = scanner.next();
                     switch (b) {
-                        case 1:
+                        case "1":
                             userPage();
                             break;
-                        case 0:
+                        case "0":
                             bbsBiz = null;
                             break logout;
                         default:
-                            visitForum(b - 2);
+                            visitForum(Integer.parseInt(b) - 2);
                     }
                 }
             }
@@ -171,9 +172,9 @@ public class Main {
             }
             System.out.println("0. 返回");
             System.out.println(StringFormatter.splitLine("-", REPLY_LINE_WIDTH));
-            int a = scanner.nextInt();
+            String a = scanner.next();
             switch (a) {
-                case 1:
+                case "1":
                     if (bbsBiz.getUserGroup().getAllowReply().equals("0")) {
                         System.out.println("没有回复权限！");
                         try {
@@ -199,9 +200,10 @@ public class Main {
                         System.out.println("回复成功！");
                         break;
                     }
-                case 0:
+                case "0":
                     return;
                 default:
+                    System.out.println("输入错误");
             }
         }
     }
@@ -241,12 +243,12 @@ public class Main {
                 }
                 System.out.println("0. 返回");
                 System.out.println(StringFormatter.splitLine("-", POST_LINE_WIDTH));
-                int a = scanner.nextInt();
+                String a = scanner.next();
                 switch (a) {
-                    case 1:
+                    case "1":
                         reply(posts.get(i));
                         break;
-                    case 2:
+                    case "2":
                         if (bbsBiz.getUserGroup().getAllowTopPost().equals("0")) {
                             System.out.println("指令错误！");
                         } else {
@@ -265,7 +267,7 @@ public class Main {
                             }
                         }
                         break;
-                    case 3:
+                    case "3":
                         if (bbsBiz.getUserGroup().getAllowEditPost().equals("0")) {
                             System.out.println("指令错误！");
                         } else {
@@ -286,7 +288,7 @@ public class Main {
                             }
                         }
                         break;
-                    case 4:
+                    case "4":
                         if (bbsBiz.getUserGroup().getAllowDelPost().equals("0")) {
                             System.out.println("指令错误！");
                         } else {
@@ -299,9 +301,10 @@ public class Main {
                             }
                         }
                         return;
-                    case 0:
+                    case "0":
                         return;
                     default:
+                        System.out.println("输入错误");
                 }
             }
         }
@@ -466,14 +469,14 @@ public class Main {
     private static void userPage() {
         while (true) {
             showUserMenu();
-            int a = scanner.nextInt();
+            String a = scanner.next();
             switch (a) {
-                case 0:
+                case "0":
                     return;
-                case 1:
+                case "1":
                     editUserInfo();
                     break;
-                case 2:
+                case "2":
                     if ((bbsBiz.getUserGroup().getAllowEditForum().equals("1")
                             || bbsBiz.getUserGroup().getAllowBanUser().equals("1")
                             || bbsBiz.getUserGroup().getAllowEditUser().equals("1"))) {
@@ -481,6 +484,7 @@ public class Main {
                     }
                     break;
                 default:
+                    System.out.println("输入错误！");
             }
         }
     }
@@ -496,19 +500,20 @@ public class Main {
     private static void editUserInfo() {
         while (true) {
             showEditUserInfoMenu();
-            int a = scanner.nextInt();
+            String a = scanner.next();
             switch (a) {
-                case 1:
+                case "1":
                     System.out.println("请输入新邮箱：");
                     bbsBiz.changeEmail(scanner.next());
                     break;
-                case 2:
+                case "2":
                     System.out.println("请输入新密码：");
                     bbsBiz.changePassword(scanner.next());
                     break;
-                case 0:
+                case "0":
                     return;
                 default:
+                    System.out.println("输入错误！");
             }
         }
     }
@@ -516,18 +521,19 @@ public class Main {
     private static void bbsManage() {
         while (true) {
             showBbsManageMenu();
-            int a = scanner.nextInt();
+            String a = scanner.next();
             switch (a) {
-                case 1:
+                case "1":
                     editForum();
                     forums = bbsBiz.getForums();
                     break;
-                case 2:
+                case "2":
                     editUser();
                     break;
-                case 0:
+                case "0":
                     return;
                 default:
+                    System.out.println("输入错误！");
             }
         }
     }
@@ -539,15 +545,15 @@ public class Main {
         System.out.println("1. 添加板块");
         System.out.println("2. 删除板块");
         System.out.println("0. 返回");
-        int a = scanner.nextInt();
+        String a = scanner.next();
         switch (a) {
-            case 1:
+            case "1":
                 System.out.println("输入新板块名字：");
                 String forumName = scanner.next();
                 bbsBiz.addForum(forumName);
                 System.out.println("添加成功！");
                 break;
-            case 2:
+            case "2":
                 System.out.println("输入板块ID：");
                 String forumId = scanner.next();
                 while (!bbsBiz.hasForumId(forumId)) {
@@ -561,9 +567,11 @@ public class Main {
                 bbsBiz.delForum(forumId);
                 System.out.println("删除成功！");
                 break;
-            case 0:
+            case "0":
                 return;
             default:
+                System.out.println("输入错误！");
+
         }
     }
 
@@ -585,17 +593,17 @@ public class Main {
             }
         }
         System.out.println("请选择操作：1. 删除用户； 2. 禁言用户； 3. 更改用户组");
-        int b = scanner.nextInt();
+        String b = scanner.next();
         switch (b) {
-            case 1:
+            case "1":
                 bbsBiz.delUser(userId);
                 System.out.println("删除成功！");
                 break;
-            case 2:
+            case "2":
                 bbsBiz.banUser(userId);
                 System.out.println("禁言成功！");
                 break;
-            case 3:
+            case "3":
                 System.out.println("当前用户组（1 表示允许，0 表示不允许）：");
                 showUserGroups();
                 System.out.println("请输入用户组 ID");
@@ -612,15 +620,16 @@ public class Main {
                 System.out.println("修改成功！");
                 break;
             default:
+                System.out.println("输入错误！");
         }
     }
 
     private static void showAbout() {
         System.out.println(StringFormatter.alignCenter("About", '-', MENU_LINE_WIDTH));
         System.out.println("untitled BBS 管理系统");
-        System.out.println("版本: 1.0.0");
+        System.out.println("版本: 1.0.1");
         System.out.println("作者: 倪可塑、王馨怡、朱君鹏、卢琦、白雪婷");
-        System.out.println("2019-7-11");
+        System.out.println("2019-7-12");
         System.out.println(StringFormatter.splitLine("-", MENU_LINE_WIDTH));
         try {
             Thread.sleep(1000);

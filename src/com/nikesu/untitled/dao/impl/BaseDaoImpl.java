@@ -97,7 +97,7 @@ public class BaseDaoImpl implements BaseDao {
      * @param param 对应的参数
      * @return 受影响的行数
      */
-    public int executeUpdate(String preparedSql, Object[] param) {
+    protected int executeUpdate(String preparedSql, Object[] param) {
         int num = 0;
         try {
             Connection connection = getConnection();
@@ -122,7 +122,7 @@ public class BaseDaoImpl implements BaseDao {
      * @param sql
      * @return 受影响的行数
      */
-    public int executeUpdate(String sql) {
+    protected int executeUpdate(String sql) {
         return executeUpdate(sql, null);
     }
 
@@ -142,7 +142,7 @@ public class BaseDaoImpl implements BaseDao {
      *           但字段名中的大写字母在数据库列名中为小写
      * @return 受影响的行数（应当是 1）
      */
-    public <T> int insertToTable(String table, T t) {
+    protected <T> int insertToTable(String table, T t) {
         StringBuilder sql = new StringBuilder("INSERT INTO " + table + " (");
         ArrayList<String> columns = new ArrayList<>();
         ArrayList<Object> param = new ArrayList<>();
@@ -189,7 +189,7 @@ public class BaseDaoImpl implements BaseDao {
      * @see BaseDaoImpl#insertToTable(String, T)
      * @return 受影响的行数
      */
-    public <T> int insertToTable(String table, T...t) {
+    protected <T> int insertToTable(String table, T...t) {
         int num = 0;
         for (int i = 0; i < t.length; i++) {
             num += insertToTable(table, t[i]);
@@ -209,7 +209,7 @@ public class BaseDaoImpl implements BaseDao {
      *           4. T 的每个字段和对应的 get 方法都使用驼峰命名法（如 userName 和 getUserName()）
      * @return 如果查询结果为空，返回一个长度为 0 的 ArrayList。
      */
-    public <T> ArrayList<T> executeQuery(String preparedSql, Object[] param, Class<T> tClass) {
+    protected <T> ArrayList<T> executeQuery(String preparedSql, Object[] param, Class<T> tClass) {
         ArrayList<T> list = new ArrayList<>();
 
         try {
@@ -258,7 +258,7 @@ public class BaseDaoImpl implements BaseDao {
      *           4. T 的每个字段和对应的 get 方法都使用驼峰命名法（如 userName 和 getUserName()）
      * @return 如果查询结果为空，返回一个长度为 0 的 ArrayList。
      */
-    public <T> ArrayList<T> executeQuery(String sql, Class<T> tClass) {
+    protected <T> ArrayList<T> executeQuery(String sql, Class<T> tClass) {
         return executeQuery(sql, null, tClass);
     }
 
@@ -273,7 +273,7 @@ public class BaseDaoImpl implements BaseDao {
      *           4. T 的每个字段和对应的 get 方法都使用驼峰命名法（如 userName 和 getUserName()）
      * @return 如果查询结果为空，返回一个长度为 0 的 ArrayList。
      */
-    public <T> ArrayList<T> getAllFromTable (String table, Class<T> tClass) {
+    protected <T> ArrayList<T> getAllFromTable (String table, Class<T> tClass) {
         return executeQuery("SELECT * FROM " + table + ";", tClass);
     }
 }

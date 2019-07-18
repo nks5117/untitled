@@ -1,3 +1,7 @@
-演示用数据库已删除，请自行配置数据库，运行 `install.sql` 和 `install-data.sql` 脚本，并修改 `db.properties` 配置文件。
+# Note
+演示视频中偶然出现的卡顿是网络问题，不是程序的问题。
+我们的数据库运行在远程服务器上，演示时校园网较慢，所以会出现卡顿。
+
+演示用数据库在演示结束后即已删除，运行代码前请自行配置好 MySQL 数据库，运行 `install.sql` 和 `install-data.sql` 脚本，并相应修改 `db.properties` 配置文件。
 
 默认的管理员用户名为 `admin`，密码为 `admin`。
